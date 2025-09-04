@@ -40,6 +40,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "html.tailus.io",
       },
+      {
+        protocol: "https",
+        hostname: "cavemanwatches.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.pizzamanchickenman.com",
+      },
     ],
   },
 };
