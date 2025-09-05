@@ -53,6 +53,11 @@
     "husky": "~9.1.6",
     "lint-staged": "~13.2.2"
   },
+  "overrides": {
+    "@rainbow-me/rainbowkit": "2.2.7",
+    "viem": "2.x",
+    "wagmi": "^2.16.9"
+  },
   "packageManager": "yarn@3.2.3",
   "engines": {
     "node": ">=20.18.3"
