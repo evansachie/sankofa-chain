@@ -5,3 +5,4 @@ export * from "./FeaturedProducts";
 export * from "./HowItWorks";
 export * from "./Features";
 export * from "./Newsletter";
+export * from "./Partners";

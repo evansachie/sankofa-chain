@@ -7,8 +7,7 @@ import { usePathname } from "next/navigation";
 import { SwitchTheme } from "./SwitchTheme";
 import { hardhat } from "viem/chains";
 import {
-  Bars3Icon,
-  BugAntIcon,
+  Bars3Icon, // BugAntIcon,
   ScaleIcon,
   ShoppingBagIcon,
   ShoppingCartIcon,
@@ -31,7 +30,7 @@ export const menuLinks: HeaderMenuLink[] = [
   { label: "Marketplace", href: "/marketplace", icon: <ShoppingBagIcon className="h-4 w-4" /> },
   { label: "Creators", href: "/creators", icon: <UserGroupIcon className="h-4 w-4" /> },
   { label: "Brands", href: "/brands", icon: <TrophyIcon className="h-4 w-4" /> },
-  { label: "Debug Contracts", href: "/debug", icon: <BugAntIcon className="h-4 w-4" /> },
+  // { label: "Debug Contracts", href: "/debug", icon: <BugAntIcon className="h-4 w-4" /> },
 ];
 
 export const HeaderMenuLinks = () => {
