@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Footer from "./Footer";
+import ThemeSync from "./ThemeSync";
 import ScrollToTop from "./shared/ScrollToTop";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -65,6 +66,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
             avatar={BlockieAvatar}
             theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
           >
+            <ThemeSync />
             <ProgressBar height="3px" color="#2299dd" />
             <ScaffoldEthApp>{children}</ScaffoldEthApp>
             <TransactionModal />
