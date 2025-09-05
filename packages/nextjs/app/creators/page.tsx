@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { FunnelIcon, MagnifyingGlassIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { CreatorCard } from "~~/components/marketplace";
+import FollowButton from "~~/components/ui/FollowButton/FollowButton";
 import { creators as mockCreators } from "~~/data/creators";
 import { formatNumber } from "~~/lib/utils";
 import { useCreatorStore } from "~~/stores/creatorStore";
@@ -13,7 +14,6 @@ import { useCreatorStore } from "~~/stores/creatorStore";
 export default function CreatorsPage() {
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
-
   const {
     creators,
     setCreators,
@@ -241,14 +241,22 @@ export default function CreatorsPage() {
         {filteredCreators.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCreators.map(creator => (
-              <CreatorCard
-                key={creator.id}
-                creator={creator}
-                onFollow={handleFollow}
-                isFollowing={isFollowing(creator.id)}
-                variant="default"
-                showActions={true}
-              />
+              <div key={creator.id} className="relative">
+                <CreatorCard
+                  creator={creator}
+                  onFollow={handleFollow}
+                  isFollowing={isFollowing(creator.id)}
+                  variant="default"
+                  showActions={true}
+                />
+                <div className="absolute top-3 right-3">
+                  <FollowButton
+                    lookupAddress={creator.address}
+                    fallbackClassName="btn btn-secondary btn-xs"
+                    onDisconnectedClick={() => console.log("Please connect your wallet")}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         ) : (
