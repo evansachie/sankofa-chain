@@ -3,3 +3,4 @@ export * from "./ProductGrid";
 export * from "./SearchBar";
 export * from "./CreatorCard";
 export * from "./CreatorDashboard";
+export * from "./BrandCard";
