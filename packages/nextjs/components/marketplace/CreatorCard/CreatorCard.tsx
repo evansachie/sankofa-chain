@@ -3,16 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  EyeIcon,
-  MapPinIcon,
-  ShieldCheckIcon,
-  StarIcon,
-  UserMinusIcon,
-  UserPlusIcon,
-} from "@heroicons/react/24/outline";
+import { EyeIcon, MapPinIcon, ShieldCheckIcon, StarIcon } from "@heroicons/react/24/outline";
 import { ShieldCheckIcon as ShieldCheckSolidIcon } from "@heroicons/react/24/solid";
 import { formatNumber } from "~~/lib/utils";
+import FollowButton from "~~/components/ui/FollowButton/FollowButton";
 import { CreatorProfile } from "~~/types/marketplace";
 
 interface CreatorCardProps {
@@ -23,17 +17,7 @@ interface CreatorCardProps {
   showActions?: boolean;
 }
 
-export const CreatorCard = ({
-  creator,
-  onFollow,
-  isFollowing = false,
-  variant = "default",
-  showActions = true,
-}: CreatorCardProps) => {
-  const handleFollow = () => {
-    onFollow?.(creator.id);
-  };
-
+export const CreatorCard = ({ creator, variant = "default", showActions = true }: CreatorCardProps) => {
   const cardVariants = {
     default:
       "bg-base-100 border border-base-300 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/30",
@@ -90,14 +74,6 @@ export const CreatorCard = ({
                 <EyeIcon className="w-4 h-4" />
                 View Store
               </Link>
-              {onFollow && (
-                <button
-                  onClick={handleFollow}
-                  className={`btn btn-sm ${isFollowing ? "btn-outline" : "btn-secondary"}`}
-                >
-                  {isFollowing ? <UserMinusIcon className="w-4 h-4" /> : <UserPlusIcon className="w-4 h-4" />}
-                </button>
-              )}
             </div>
           </div>
         )}
@@ -133,14 +109,12 @@ export const CreatorCard = ({
               </div>
             </div>
 
-            {showActions && onFollow && variant !== "compact" && (
-              <button
-                onClick={handleFollow}
-                className={`btn btn-sm ml-2 ${isFollowing ? "btn-outline" : "btn-primary"}`}
-              >
-                {isFollowing ? <UserMinusIcon className="w-4 h-4" /> : <UserPlusIcon className="w-4 h-4" />}
-              </button>
-            )}
+            <div className="flex items-center justify-center gap-2">
+              <FollowButton
+                lookupAddress={creator.address}
+                onDisconnectedClick={() => alert("Please connect your wallet")}
+              />
+            </div>
           </div>
 
           <p className={`text-sm text-base-content/80 mb-4 ${variant === "compact" ? "line-clamp-1" : "line-clamp-2"}`}>

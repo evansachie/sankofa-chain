@@ -63,6 +63,7 @@ export default function BrandsPage() {
             className="object-cover opacity-60"
             priority
           />
+          <div className="absolute inset-0 bg-black/50" />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
