@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AdjustmentsHorizontalIcon, ListBulletIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import { ErrorBoundary } from "~~/components/ErrorBoundary";
-// import { MarketplaceTest } from "~~/components/MarketplaceTest";
-import { ThirdwebSetupStatus } from "~~/components/ThirdwebSetupStatus";
 import { ProductGrid, SearchBar } from "~~/components/marketplace";
 import { Button } from "~~/components/ui";
 import { useThirdwebMarketplace } from "~~/hooks/thirdweb/useThirdwebMarketplace";
@@ -90,13 +88,6 @@ const MarketplacePage = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ErrorBoundary>
-          <ThirdwebSetupStatus />
-        </ErrorBoundary>
-
-        {/* <ErrorBoundary>
-          <MarketplaceTest />
-        </ErrorBoundary> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
