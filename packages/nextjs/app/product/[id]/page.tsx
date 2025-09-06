@@ -16,7 +16,9 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
+import { useToast } from "~~/components/Toast";
 import { Button } from "~~/components/ui";
+import { useThirdwebMarketplace } from "~~/hooks/thirdweb/useThirdwebMarketplace";
 import { useMarketplaceStore } from "~~/stores/marketplaceStore";
 
 const ProductDetailPage = () => {
@@ -25,11 +27,19 @@ const ProductDetailPage = () => {
   const productId = params.id as string;
 
   const { getProductById } = useMarketplaceStore();
-  const product = getProductById(productId);
+  const { products: blockchainProducts, buyListing, makeOffer } = useThirdwebMarketplace();
+  const { addToast } = useToast();
+
+  // Try to find product in blockchain products first, then fallback to store
+  const blockchainProduct = blockchainProducts.find(p => p.id === productId);
+  const storeProduct = getProductById(productId);
+  const product = blockchainProduct || storeProduct;
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isMakingOffer, setIsMakingOffer] = useState(false);
 
   if (!product) {
     return (
@@ -57,7 +67,9 @@ const ProductDetailPage = () => {
 
   const formatPrice = (price: typeof product.price) => {
     if (price.currency === "ETH") {
-      return `${price.amount} ETH`;
+      // Format ETH with proper decimal places and avoid scientific notation
+      const formattedAmount = price.amount < 0.001 ? price.amount.toExponential(2) : price.amount.toFixed(4);
+      return `${formattedAmount} ETH`;
     }
     return `${price.amount.toLocaleString()} $SANKOFA`;
   };
@@ -75,6 +87,67 @@ const ProductDetailPage = () => {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  const handlePurchase = async () => {
+    if (!product.isListed || !product.listingId) {
+      alert("This product is not available for purchase");
+      return;
+    }
+
+    setIsPurchasing(true);
+    try {
+      await buyListing(product.listingId);
+      addToast({
+        type: "success",
+        title: "Purchase Successful!",
+        message: "Check your wallet for the NFT.",
+      });
+    } catch (error) {
+      console.error("Purchase failed:", error);
+      addToast({
+        type: "error",
+        title: "Purchase Failed",
+        message: "Please try again or check your wallet connection.",
+      });
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
+  const handleMakeOffer = async () => {
+    if (!product.isListed || !product.listingId) {
+      alert("This product is not available for offers");
+      return;
+    }
+
+    const offerPrice = prompt(`Enter your offer price in ETH (minimum: ${product.price.amount} ETH):`);
+    if (!offerPrice) return;
+
+    const price = parseFloat(offerPrice);
+    if (isNaN(price) || price <= 0) {
+      alert("Please enter a valid price");
+      return;
+    }
+
+    setIsMakingOffer(true);
+    try {
+      await makeOffer(product.listingId, offerPrice);
+      addToast({
+        type: "success",
+        title: "Offer Submitted!",
+        message: "Your offer has been submitted successfully.",
+      });
+    } catch (error) {
+      console.error("Offer failed:", error);
+      addToast({
+        type: "error",
+        title: "Offer Failed",
+        message: "Please try again or check your wallet connection.",
+      });
+    } finally {
+      setIsMakingOffer(false);
     }
   };
 
@@ -153,6 +226,18 @@ const ProductDetailPage = () => {
                   <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold rounded-full flex items-center gap-1">
                     <ShieldCheckIcon className="w-4 h-4" />
                     Verified Authentic
+                  </span>
+                )}
+                {product.isListed && (
+                  <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-sm font-semibold rounded-full flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Blockchain
                   </span>
                 )}
               </div>
@@ -267,9 +352,33 @@ const ProductDetailPage = () => {
                     </div>
                   )}
 
-                  <Button size="lg" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
-                    {product.availability.isDigital ? "Purchase & Download" : "Add to Cart"}
-                  </Button>
+                  {product.isListed ? (
+                    <div className="space-y-3">
+                      <Button
+                        size="lg"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                        onClick={handlePurchase}
+                        disabled={isPurchasing}
+                      >
+                        {isPurchasing ? "Processing..." : `Buy Now - ${formatPrice(product.price)}`}
+                      </Button>
+                      {product.listingType === "auction" && (
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="w-full"
+                          onClick={handleMakeOffer}
+                          disabled={isMakingOffer}
+                        >
+                          {isMakingOffer ? "Submitting Offer..." : "Make Offer"}
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <Button size="lg" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                      {product.availability.isDigital ? "Purchase & Download" : "Add to Cart"}
+                    </Button>
+                  )}
 
                   <div className="text-sm text-base-content/60 text-center">
                     {product.stats.sold} people have purchased this item

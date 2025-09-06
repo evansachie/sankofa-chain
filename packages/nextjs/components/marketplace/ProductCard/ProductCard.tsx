@@ -12,7 +12,9 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolidIcon } from "@heroicons/react/24/solid";
+import { useToast } from "~~/components/Toast";
 import { Card, CardContent } from "~~/components/ui";
+import { useThirdwebMarketplace } from "~~/hooks/thirdweb/useThirdwebMarketplace";
 import { useCartStore } from "~~/stores/cartStore";
 import { useComparisonStore } from "~~/stores/comparisonStore";
 import { useQuickViewStore } from "~~/stores/quickViewStore";
@@ -34,10 +36,13 @@ export const ProductCard = ({
   showStats = true,
 }: ProductCardProps) => {
   const [isLiking, setIsLiking] = React.useState(false);
+  const [isBuying, setIsBuying] = React.useState(false);
 
   const { addToCart } = useCartStore();
   const { openQuickView } = useQuickViewStore();
   const { addToComparison, isProductInComparison } = useComparisonStore();
+  const { buyListing, makeOffer } = useThirdwebMarketplace();
+  const { addToast } = useToast();
 
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -70,9 +75,66 @@ export const ProductCard = ({
     addToComparison(product);
   };
 
+  const handleBuyNow = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isBuying || !product.listingId) return;
+
+    setIsBuying(true);
+    try {
+      await buyListing(product.listingId);
+      addToast({
+        type: "success",
+        title: "Purchase Successful!",
+        message: "Check your wallet for the NFT.",
+      });
+    } catch (error) {
+      console.error("Failed to buy product:", error);
+      addToast({
+        type: "error",
+        title: "Purchase Failed",
+        message: "Please try again or check your wallet connection.",
+      });
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
+  const handleMakeOffer = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isBuying || !product.listingId) return;
+
+    const offerPrice = prompt("Enter your offer price in ETH:");
+    if (!offerPrice) return;
+
+    setIsBuying(true);
+    try {
+      await makeOffer(product.listingId, offerPrice);
+      addToast({
+        type: "success",
+        title: "Offer Submitted!",
+        message: "Your offer has been submitted successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to make offer:", error);
+      addToast({
+        type: "error",
+        title: "Offer Failed",
+        message: "Please try again or check your wallet connection.",
+      });
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
   const formatPrice = (price: Product["price"]) => {
     if (price.currency === "ETH") {
-      return `${price.amount} ETH`;
+      // Format ETH with proper decimal places and avoid scientific notation
+      const formattedAmount = price.amount < 0.001 ? price.amount.toExponential(2) : price.amount.toFixed(4);
+      return `${formattedAmount} ETH`;
     }
     return `${price.amount.toLocaleString()} $SANKOFA`;
   };
@@ -224,14 +286,44 @@ export const ProductCard = ({
                     <EyeIcon className="w-4 h-4" />
                     Quick View
                   </button>
-                  <button
-                    onClick={handleAddToCart}
-                    className="btn btn-secondary btn-sm gap-2 backdrop-blur-sm bg-secondary/90 hover:bg-secondary border-none"
-                    title="Add to Cart"
-                  >
-                    <ShoppingCartIcon className="w-4 h-4" />
-                    Add to Cart
-                  </button>
+
+                  {product.isListed && product.listingId && product.listingType === "direct" ? (
+                    <button
+                      onClick={handleBuyNow}
+                      disabled={isBuying}
+                      className="btn btn-success btn-sm gap-2 backdrop-blur-sm bg-green-600/90 hover:bg-green-600 border-none disabled:opacity-50"
+                      title="Buy Now"
+                    >
+                      {isBuying ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <ShoppingCartIcon className="w-4 h-4" />
+                          Buy Now
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      className="btn btn-secondary btn-sm gap-2 backdrop-blur-sm bg-secondary/90 hover:bg-secondary border-none"
+                      title="Add to Cart"
+                    >
+                      <ShoppingCartIcon className="w-4 h-4" />
+                      Add to Cart
+                    </button>
+                  )}
+
+                  {product.isListed && product.listingType === "auction" && (
+                    <button
+                      onClick={handleMakeOffer}
+                      disabled={isBuying}
+                      className="btn btn-warning btn-sm gap-2 backdrop-blur-sm bg-yellow-600/90 hover:bg-yellow-600 border-none disabled:opacity-50"
+                      title="Make Offer"
+                    >
+                      {isBuying ? "Processing..." : "Make Offer"}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -264,6 +356,18 @@ export const ProductCard = ({
               </button>
 
               <div className="absolute top-3 left-3 flex flex-col gap-2">
+                {/* {product.isListed && (
+                  <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-semibold rounded-full flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Blockchain
+                  </span>
+                )} */}
                 {product.metadata.featured && (
                   <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-semibold rounded-full">
                     Featured

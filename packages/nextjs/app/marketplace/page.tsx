@@ -3,8 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AdjustmentsHorizontalIcon, ListBulletIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { ErrorBoundary } from "~~/components/ErrorBoundary";
+// import { MarketplaceTest } from "~~/components/MarketplaceTest";
+import { ThirdwebSetupStatus } from "~~/components/ThirdwebSetupStatus";
 import { ProductGrid, SearchBar } from "~~/components/marketplace";
 import { Button } from "~~/components/ui";
+import { useThirdwebMarketplace } from "~~/hooks/thirdweb/useThirdwebMarketplace";
 import { useMarketplaceStore } from "~~/stores/marketplaceStore";
 
 const MarketplacePage = () => {
@@ -12,12 +16,14 @@ const MarketplacePage = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
 
+  // Get thirdweb data
+  const { products: blockchainProducts, isLoading: isLoadingBlockchain } = useThirdwebMarketplace();
+
   const {
     filteredProducts,
-    isLoading,
+    isLoading: isLoadingStore,
     currentPage,
     itemsPerPage,
-    totalItems,
     filters,
     setCurrentPage,
     setFilters,
@@ -25,14 +31,18 @@ const MarketplacePage = () => {
     resetFilters,
   } = useMarketplaceStore();
 
+  // Combine blockchain products with store products (blockchain products first)
+  const allProducts = [...blockchainProducts, ...filteredProducts];
+  const isLoading = isLoadingStore || isLoadingBlockchain;
+
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const currentProducts = allProducts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(allProducts.length / itemsPerPage);
 
   const handleLike = (productId: string) => {
     setLikedProducts(prev => {
@@ -80,6 +90,14 @@ const MarketplacePage = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ErrorBoundary>
+          <ThirdwebSetupStatus />
+        </ErrorBoundary>
+
+        {/* <ErrorBoundary>
+          <MarketplaceTest />
+        </ErrorBoundary> */}
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
             <div className="sticky top-24">
@@ -226,7 +244,12 @@ const MarketplacePage = () => {
 
                 <div className="pt-4 border-t border-base-content/10">
                   <div className="text-sm text-base-content/60 mb-2">Results</div>
-                  <div className="text-lg font-semibold text-base-content">{totalItems.toLocaleString()} products</div>
+                  <div className="text-lg font-semibold text-base-content">
+                    {allProducts.length.toLocaleString()} products
+                  </div>
+                  {blockchainProducts.length > 0 && (
+                    <div className="text-xs text-green-600 mt-1">{blockchainProducts.length} from blockchain</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -236,7 +259,8 @@ const MarketplacePage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
               <div className="flex items-center gap-4">
                 <span className="text-sm text-base-content/60">
-                  Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems.toLocaleString()} products
+                  Showing {startIndex + 1}-{Math.min(endIndex, allProducts.length)} of{" "}
+                  {allProducts.length.toLocaleString()} products
                 </span>
               </div>
 
@@ -270,14 +294,16 @@ const MarketplacePage = () => {
             </div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-              <ProductGrid
-                products={currentProducts}
-                isLoading={isLoading}
-                variant="default"
-                viewMode={viewMode}
-                onLike={handleLike}
-                likedProducts={likedProducts}
-              />
+              <ErrorBoundary>
+                <ProductGrid
+                  products={currentProducts}
+                  isLoading={isLoading}
+                  variant="default"
+                  viewMode={viewMode}
+                  onLike={handleLike}
+                  likedProducts={likedProducts}
+                />
+              </ErrorBoundary>
             </motion.div>
 
             {totalPages > 1 && (

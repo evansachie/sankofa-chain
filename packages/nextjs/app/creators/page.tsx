@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { FunnelIcon, MagnifyingGlassIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { CreatorCard } from "~~/components/marketplace";
-import FollowButton from "~~/components/ui/FollowButton/FollowButton";
 import { creators as mockCreators } from "~~/data/creators";
 import { formatNumber } from "~~/lib/utils";
 import { useCreatorStore } from "~~/stores/creatorStore";
@@ -249,13 +248,6 @@ export default function CreatorsPage() {
                   variant="default"
                   showActions={true}
                 />
-                <div className="absolute top-3 right-3">
-                  <FollowButton
-                    lookupAddress={creator.address}
-                    fallbackClassName="btn btn-secondary btn-xs"
-                    onDisconnectedClick={() => console.log("Please connect your wallet")}
-                  />
-                </div>
               </div>
             ))}
           </div>

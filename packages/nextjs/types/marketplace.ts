@@ -45,6 +45,12 @@ export interface Product {
     featured: boolean;
     trending: boolean;
   };
+  // Blockchain specific data
+  tokenId?: string;
+  contractAddress?: string;
+  listingId?: string;
+  isListed?: boolean;
+  listingType?: "direct" | "auction";
 }
 
 export interface Category {

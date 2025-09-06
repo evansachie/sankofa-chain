@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Footer from "./Footer";
+import ThemeSync from "./ThemeSync";
 import ScrollToTop from "./shared/ScrollToTop";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -12,6 +13,9 @@ import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
 import { Header } from "~~/components/Header";
+import { MarketplaceDataProvider } from "~~/components/MarketplaceDataProvider";
+import { ThirdwebProvider } from "~~/components/ThirdwebProvider";
+import { ToastProvider } from "~~/components/Toast";
 import { CartSidebar } from "~~/components/marketplace/CartSidebar/CartSidebar";
 import { ProductComparison } from "~~/components/marketplace/ProductComparison/ProductComparison";
 import { QuickViewModal } from "~~/components/marketplace/QuickViewModal/QuickViewModal";
@@ -58,19 +62,26 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   }, []);
 
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <TransactionProvider>
-          <RainbowKitProvider
-            avatar={BlockieAvatar}
-            theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
-          >
-            <ProgressBar height="3px" color="#2299dd" />
-            <ScaffoldEthApp>{children}</ScaffoldEthApp>
-            <TransactionModal />
-          </RainbowKitProvider>
-        </TransactionProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ThirdwebProvider>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <TransactionProvider>
+            <RainbowKitProvider
+              avatar={BlockieAvatar}
+              theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
+            >
+              <ThemeSync />
+              <ProgressBar height="3px" color="#2299dd" />
+              <ToastProvider>
+                <MarketplaceDataProvider>
+                  <ScaffoldEthApp>{children}</ScaffoldEthApp>
+                </MarketplaceDataProvider>
+              </ToastProvider>
+              <TransactionModal />
+            </RainbowKitProvider>
+          </TransactionProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ThirdwebProvider>
   );
 };

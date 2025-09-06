@@ -3,7 +3,7 @@ import { CreatorProfile } from "~~/types/marketplace";
 export const creators: CreatorProfile[] = [
   {
     id: "1",
-    address: "0x742d35Cc6634C0532925a3b8D5C9E9C77E2f3C1F",
+    address: "0x1234567890123456789012345678901234567890",
     name: "Amara Kone",
     bio: "Master weaver from Mali specializing in traditional bogolan (mud cloth) with modern artistic interpretations. My work preserves ancient techniques while exploring contemporary expressions.",
     story:

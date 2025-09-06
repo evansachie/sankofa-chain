@@ -3,7 +3,7 @@ import { Product } from "~~/types/marketplace";
 export const products: Product[] = [
   {
     id: "1",
-    name: "Authentic Kente Cloth Pattern #001",
+    name: "Local Authentic Kente Cloth Pattern #001",
     description:
       "Hand-woven traditional Kente cloth with authentic Asante patterns. Each thread tells a story of our rich cultural heritage. This piece represents wisdom, creativity, and strength.",
     price: {
@@ -56,7 +56,7 @@ export const products: Product[] = [
   },
   {
     id: "2",
-    name: "Adinkra Symbol Jewelry Set",
+    name: "Local Adinkra Symbol Jewelry Set",
     description:
       "Handcrafted gold-plated jewelry featuring traditional Adinkra symbols. Each piece represents deep philosophical concepts and African wisdom.",
     price: {
@@ -107,7 +107,7 @@ export const products: Product[] = [
   },
   {
     id: "3",
-    name: "Wooden Mask - Akan Fertility",
+    name: "Local Wooden Mask - Akan Fertility",
     description:
       "Traditional Akan fertility mask carved from premium African mahogany. Sacred symbol of life, fertility, and prosperity in Akan culture.",
     price: {
@@ -159,7 +159,7 @@ export const products: Product[] = [
   },
   {
     id: "13",
-    name: "Traditional Footwear",
+    name: "Local Traditional Footwear",
     description:
       "Handcrafted African footwear worn for centuries across West Africa. Made with durable hide and natural dyes, they blend comfort, heritage, and timeless everyday style.",
     price: {
@@ -211,7 +211,7 @@ export const products: Product[] = [
   },
   {
     id: "4",
-    name: "Digital Kente Pattern Collection",
+    name: "Local Digital Kente Pattern Collection",
     description:
       "Exclusive digital collection of 50 unique Kente patterns with commercial usage rights. Perfect for fashion designers and digital artists.",
     price: {
@@ -262,7 +262,7 @@ export const products: Product[] = [
   },
   {
     id: "5",
-    name: "Shea Butter & African Black Soap Set",
+    name: "Local Shea Butter & African Black Soap Set",
     description:
       "Premium skincare set featuring raw shea butter and traditional African black soap. Sourced directly from women's cooperatives in Northern Ghana.",
     price: {
@@ -313,7 +313,7 @@ export const products: Product[] = [
   },
   {
     id: "6",
-    name: "Kente Pattern Design Workshop",
+    name: "Local Kente Pattern Design Workshop",
     description:
       "Virtual workshop experience learning traditional Kente weaving patterns from master weavers. Includes materials kit and 3-hour live session.",
     price: {
@@ -365,7 +365,7 @@ export const products: Product[] = [
   },
   {
     id: "7",
-    name: "Handwoven Basket Collection",
+    name: "Local Handwoven Basket Collection",
     description:
       "Beautiful collection of traditional African baskets made from sustainable materials. Perfect for home décor and storage.",
     price: {
@@ -418,7 +418,7 @@ export const products: Product[] = [
   },
   {
     id: "8",
-    name: "African Print Fabric Bundle",
+    name: "Local African Print Fabric Bundle",
     description:
       "Premium collection of authentic African print fabrics. Vibrant colors and traditional patterns perfect for fashion and crafts.",
     price: {
@@ -470,7 +470,7 @@ export const products: Product[] = [
   },
   {
     id: "9",
-    name: "Traditional Drumming Workshop",
+    name: "Local Traditional Drumming Workshop",
     description:
       "Learn traditional African drumming techniques in this immersive virtual workshop. Includes practice drum and cultural history.",
     price: {
@@ -522,7 +522,7 @@ export const products: Product[] = [
   },
   {
     id: "10",
-    name: "Cocoa Butter Skincare Set",
+    name: "Local Cocoa Butter Skincare Set",
     description:
       "Pure Ghanaian cocoa butter skincare collection. Nourishing and moisturizing products made from premium cocoa beans.",
     price: {
@@ -574,7 +574,7 @@ export const products: Product[] = [
   },
   {
     id: "11",
-    name: "Bronze Akan Weights Set",
+    name: "Local Bronze Akan Weights Set",
     description:
       "Authentic replica of traditional Akan gold weights used in ancient trade. Each piece represents different proverbs and wisdom.",
     price: {
@@ -625,7 +625,7 @@ export const products: Product[] = [
   },
   {
     id: "12",
-    name: "Batik Art Workshop Experience",
+    name: "Local Batik Art Workshop Experience",
     description:
       "Master the ancient art of batik in this hands-on virtual workshop. Learn traditional techniques and create your own patterns.",
     price: {
