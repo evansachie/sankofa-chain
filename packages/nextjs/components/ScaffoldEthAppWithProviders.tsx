@@ -62,9 +62,9 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   }, []);
 
   return (
-    <ThirdwebProvider>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <ThirdwebProvider>
           <TransactionProvider>
             <RainbowKitProvider
               avatar={BlockieAvatar}
@@ -80,8 +80,8 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
               <TransactionModal />
             </RainbowKitProvider>
           </TransactionProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </ThirdwebProvider>
+        </ThirdwebProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };
