@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import {
-  type RequiredParam,
   useAddress,
+  useConnect,
   useContract,
   useOwnedNFTs,
   useValidDirectListings,
@@ -13,9 +13,11 @@ import type { Product } from "~~/types/marketplace";
 
 const MARKETPLACE_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS || "";
 const NFT_COLLECTION_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_NFT_COLLECTION_CONTRACT_ADDRESS || "";
+const ACCOUNT_FACTORY_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ACCOUNT_FACTORY_CONTRACT_ADDRESS || "";
 
 export const useThirdwebMarketplace = () => {
-  const address: RequiredParam<string> = useAddress();
+  const address = useAddress(); // Use Thirdweb's useAddress hook
+  const connect = useConnect(); // For wallet connection
 
   // Check if environment variables are set
   const isConfigured = MARKETPLACE_CONTRACT_ADDRESS && NFT_COLLECTION_CONTRACT_ADDRESS;
@@ -28,6 +30,9 @@ export const useThirdwebMarketplace = () => {
     isConfigured ? NFT_COLLECTION_CONTRACT_ADDRESS : undefined,
     "nft-collection",
   );
+
+  // Account factory contract for smart wallet functionality
+  const { contract: accountFactory } = useContract(ACCOUNT_FACTORY_CONTRACT_ADDRESS || undefined, "account-factory");
 
   // Use the correct hooks for MarketplaceV3 only if contracts are configured
   const {
@@ -172,6 +177,7 @@ export const useThirdwebMarketplace = () => {
 
   const buyListing = async (listingId: string) => {
     if (!marketplace) throw new Error("Marketplace contract not initialized");
+    if (!address) throw new Error("Please connect your wallet first");
 
     try {
       // Find the listing to get its details
@@ -184,19 +190,49 @@ export const useThirdwebMarketplace = () => {
         throw new Error("This is an auction listing. Use makeOffer instead.");
       }
 
-      // Buy the direct listing using the correct API
-      const tx = await (marketplace as any).buyoutListing(listingId, 1); // quantity = 1
+      console.log("Attempting to buy listing:", {
+        listingId,
+        price: listing.pricePerToken?.toString(),
+        address,
+        marketplace: !!marketplace,
+      });
+
+      // Buy the direct listing using the correct MarketplaceV3 API
+      const tx = await (marketplace as any).directListings.buyFromListing(
+        listingId,
+        "1", // quantity
+        "0x0000000000000000000000000000000000000000", // ETH address
+        listing.pricePerToken?.toString() || "0",
+      );
       console.log("Buy transaction:", tx);
 
       return tx;
     } catch (error) {
       console.error("Buy listing error:", error);
+
+      // Handle specific error cases
+      if (error instanceof Error) {
+        if (error.message.includes("429")) {
+          throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+        }
+        if (error.message.includes("insufficient funds")) {
+          throw new Error("Insufficient funds. Please check your wallet balance.");
+        }
+        if (error.message.includes("user rejected")) {
+          throw new Error("Transaction was cancelled by user.");
+        }
+        if (error.message.includes("Cannot create a transaction without a signer")) {
+          throw new Error("Wallet connection issue. Please reconnect your wallet and try again.");
+        }
+      }
+
       throw error;
     }
   };
 
   const makeOffer = async (listingId: string, pricePerToken: string) => {
     if (!marketplace) throw new Error("Marketplace contract not initialized");
+    if (!address) throw new Error("Please connect your wallet first");
 
     try {
       // Find the listing to get its details
@@ -211,16 +247,21 @@ export const useThirdwebMarketplace = () => {
 
       let tx;
       if (isDirectListing) {
-        // Make an offer on a direct listing
-        tx = await (marketplace as any).direct.makeOffer(
-          listingId,
-          1, // quantity
-          "0x0000000000000000000000000000000000000000", // ETH address
+        // Make an offer on a direct listing using the offers extension
+        tx = await (marketplace as any).offers.makeOffer(
+          listing.assetContractAddress,
+          listing.asset?.id,
           priceInWei,
+          "0x0000000000000000000000000000000000000000", // ETH
+          Math.floor(Date.now() / 1000) + 86400, // 24 hours
         );
       } else {
         // Make a bid on an auction listing
-        tx = await (marketplace as any).auction.makeBid(listingId, priceInWei);
+        tx = await (marketplace as any).englishAuctions.makeBid(
+          listingId,
+          priceInWei,
+          "0x0000000000000000000000000000000000000000", // ETH
+        );
       }
 
       console.log("Make offer/bid transaction:", tx);
@@ -246,5 +287,8 @@ export const useThirdwebMarketplace = () => {
     makeOffer,
     marketplace,
     nftCollection,
+    accountFactory, // Export the account factory contract if needed elsewhere
+    address,
+    connect,
   };
 };

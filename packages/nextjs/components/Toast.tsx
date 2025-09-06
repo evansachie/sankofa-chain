@@ -56,7 +56,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
 const ToastContainer = ({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) => {
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-50 space-y-3 max-w-md">
       {toasts.map(toast => (
         <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
       ))}
@@ -68,15 +68,15 @@ const ToastItem = ({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   const getToastStyles = (type: Toast["type"]) => {
     switch (type) {
       case "success":
-        return "bg-green-50 border-green-200 text-green-800";
+        return "bg-green-50/95 border-green-200 text-green-900 shadow-green-200/50";
       case "error":
-        return "bg-red-50 border-red-200 text-red-800";
+        return "bg-red-50/95 border-red-200 text-red-900 shadow-red-200/50";
       case "warning":
-        return "bg-yellow-50 border-yellow-200 text-yellow-800";
+        return "bg-yellow-50/95 border-yellow-200 text-yellow-900 shadow-yellow-200/50";
       case "info":
-        return "bg-blue-50 border-blue-200 text-blue-800";
+        return "bg-blue-50/95 border-blue-200 text-blue-900 shadow-blue-200/50";
       default:
-        return "bg-gray-50 border-gray-200 text-gray-800";
+        return "bg-gray-50/95 border-gray-200 text-gray-900 shadow-gray-200/50";
     }
   };
 
@@ -126,20 +126,20 @@ const ToastItem = ({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   };
 
   return (
-    <div className={`max-w-sm w-full border rounded-lg p-4 shadow-lg ${getToastStyles(toast.type)}`}>
-      <div className="flex items-start">
-        <div className="flex-shrink-0">{getIcon(toast.type)}</div>
-        <div className="ml-3 w-0 flex-1">
-          <p className="text-sm font-medium">{toast.title}</p>
-          {toast.message && <p className="mt-1 text-sm opacity-90">{toast.message}</p>}
+    <div className={`w-full border rounded-xl p-4 shadow-xl backdrop-blur-sm ${getToastStyles(toast.type)}`}>
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-0.5">{getIcon(toast.type)}</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold leading-5">{toast.title}</p>
+          {toast.message && <p className="mt-1 text-sm leading-5 break-words">{toast.message}</p>}
         </div>
-        <div className="ml-4 flex-shrink-0 flex">
+        <div className="flex-shrink-0">
           <button
-            className="rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="rounded-lg inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 p-1 hover:bg-gray-100 transition-colors"
             onClick={() => onRemove(toast.id)}
           >
             <span className="sr-only">Close</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
